@@ -5,7 +5,10 @@ const Movement = {
         DIR: {
             PLUS: 1,
             MINUS: -1
-        }
+        },
+        NAME: [
+            "VERTICAL", "HORIZONTAL"
+        ]
 }
 
 const KeyName = {
@@ -68,7 +71,9 @@ class Snake {
                 }
             }
             var i = this.paths.length - 1;
-            this.paths.push( this.paths[i] );
+            var new_x = this.paths[i][0];
+            var new_y = this.paths[i][1];
+            this.paths.push( [new_x, new_y] );
             logConsole( this.paths );
         }
     }
@@ -82,8 +87,10 @@ class Snake {
             }
 
             var mouseXY = this.#getMouseXY(env);
-            this.paths.push(mouseXY);
-            this.paths.push(mouseXY);
+            this.paths.push([mouseXY[0], mouseXY[1]]);
+            this.paths.push([mouseXY[0], mouseXY[1]]);
+            this.#growSnake(20);
+            this.#redraw()
         }
 
         document.onmouseup=(env) => {
@@ -96,7 +103,7 @@ class Snake {
                 function() {
                     self.moveSnake();
                 },
-                10
+                100
             );
             logConsole(this.paths);
         }
@@ -222,18 +229,48 @@ class Snake {
     }
 
     moveSnake() {
-        var i = this.paths.length - 1;
+        this.#growSnake();
+        this.#reduceTail();
+        this.#redraw();
+    }
+
+    #reduceTail(size=1) {
         if( this.movement == Movement.HORIZONTAL ) {
-            var x = this.paths[i][0] += this.movementDir;
+            var x = this.paths[0][0] += this.movementDir * size;
+            var y = this.paths[0][1];
+            this.paths[0] = [ x, y ];
+        }
+        else {
+            var x = this.paths[0][0];
+            var y = this.paths[0][1] += this.movementDir * size;
+            this.paths[0] = [ x, y ];
+        }
+    }
+
+    #growSnake(size=2) {
+        var i = this.paths.length - 1;
+        /*
+        console.clear();
+        console.log("i = " + i)
+        console.log("grow size: " + size);
+        console.log("point @ i: " + this.paths[i][0] + "," + this.paths[i][1]);
+        console.log(Movement.NAME[this.movement] + ": " + this.movementDir * size)
+        console.log(this.paths);
+        */
+        if( this.movement == Movement.HORIZONTAL ) {
+            var x = this.paths[i][0] += this.movementDir * size;
             var y = this.paths[i][1];
             this.paths[i] = [ x, y ];
         }
         else {
             var x = this.paths[i][0];
-            var y = this.paths[i][1] += this.movementDir;
+            var y = this.paths[i][1] += this.movementDir * size;
             this.paths[i] = [ x, y ];
         }
-        this.#redraw();
+        /*
+        console.log("point @ i: " + this.paths[i][0] + "," + this.paths[i][1]);
+        console.log(this.paths);
+        */
     }
 
 }
