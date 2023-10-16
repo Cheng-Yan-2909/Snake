@@ -95,6 +95,8 @@ class Snake {
 
         document.onmouseup=(env) => {
             if( this.isPlaying ) {
+                this.stop();
+                this.isPlaying = false;
                 return;
             }
 
@@ -232,6 +234,62 @@ class Snake {
         this.#growSnake();
         this.#reduceTail();
         this.#redraw();
+        this.#checkHit();
+    }
+
+    #checkHit() {
+        console.clear();
+        console.log("path length: " + this.paths.length);
+        if( this.paths.length <= 3 ) {
+            return;
+        }
+        
+        var currentLine = this.paths[this.paths.length - 1];
+        var i = 0;
+
+        console.log("current line: " + currentLine);
+        console.log("i = " + i)
+
+        try {
+            while( i + 1 < this.paths.length ) {
+                if( this.paths[i][0] == this.paths[i+1][0]) {  // veritical line
+                    console.log("It's vertical line check")
+                    if(currentLine[0] == this.paths[i][0]) {  // current line's x is on the same x as the path
+                        if( currentLine[1] == this.paths[i][1] ) {
+                            this.#gameOver();
+                        }
+                        if( currentLine[1] == this.paths[i+1][1] ) {
+                            this.#gameOver();
+                        }
+                        if( this.paths[i][1] > this.paths[i+1][1] ) {
+                            if( (currentLine[1] > this.paths[i+1][1]) && (currentLine[1] < this.paths[i][1]) ) {
+                                this.#gameOver();
+                            }
+                        }
+                        else {
+                            if( (currentLine[1] > this.paths[i][1]) && (currentLine[1] < this.paths[i+1][1]) ) {
+                                this.#gameOver();
+                            }
+                        }
+                    } 
+                }
+                else {  // horizontal line
+
+                }
+
+                i++;
+            }
+        }
+        catch(e) {
+            console.log("Game Over")
+        }
+
+    }
+
+    #gameOver() {
+        this.stop();
+        window.alert("Game Over");
+        throw "Game Over";
     }
 
     #reduceTail(size=1) {
