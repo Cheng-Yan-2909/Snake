@@ -235,16 +235,42 @@ class Snake {
     }
 
     #reduceTail(size=1) {
-        if( this.movement == Movement.HORIZONTAL ) {
-            var x = this.paths[0][0] += this.movementDir * size;
-            var y = this.paths[0][1];
-            this.paths[0] = [ x, y ];
+        var x = this.paths[0][0];
+        var y = this.paths[0][1];
+
+        if(this.paths[0][0] == this.paths[1][0]) { // x is the same
+            // vertical
+            if( this.paths[0][1] == this.paths[1][1] ) { // y is the same: done
+                this.paths.shift();
+                return;
+            }
+
+            if(this.paths[0][1] > this.paths[1][1]) {
+                // moving up
+                y -= size;
+            }
+            else {
+                y += size;
+            }
         }
         else {
-            var x = this.paths[0][0];
-            var y = this.paths[0][1] += this.movementDir * size;
-            this.paths[0] = [ x, y ];
+            // horizontal
+            if( this.paths[0][0] == this.paths[1][0] ) {  // x is the same: done
+                this.paths.shift();
+                return;
+            }
+
+            if(this.paths[0][0] > this.paths[1][0]) {
+                // moving left
+                x -= size;
+            }
+            else {
+                x += size;
+            }
         }
+
+        this.paths[0] = [ x, y ];
+
     }
 
     #growSnake(size=2) {
