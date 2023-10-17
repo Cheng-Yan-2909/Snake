@@ -238,58 +238,73 @@ class Snake {
     }
 
     #checkHit() {
-        console.clear();
-        console.log("path length: " + this.paths.length);
+        //console.clear();
+        //console.log("path length: " + this.paths.length);
         if( this.paths.length <= 3 ) {
             return;
         }
+
+        console.clear();
         
         var currentLine = this.paths[this.paths.length - 1];
         var i = 0;
+        var currentX = currentLine[0];
+        var currentY = currentLine[1];
 
-        console.log("current line: " + currentLine);
-        console.log("i = " + i)
+        // console.log("current line: " + currentLine);
+        // console.log("i = " + i)
 
         try {
-            while( i + 1 < this.paths.length ) {
-                if( this.paths[i][0] == this.paths[i+1][0]) {  // veritical line
-                    console.log("It's vertical line check")
-                    if(currentLine[0] == this.paths[i][0]) {  // current line's x is on the same x as the path
-                        if( currentLine[1] == this.paths[i][1] ) {
-                            this.#gameOver();
+            while( i + 1 < this.paths.length - 3 ) {
+                var x1 = this.paths[i][0];
+                var x2 = this.paths[i+1][0];
+                var y1 = this.paths[i][1];
+                var y2 = this.paths[i+1][1];
+                
+                /*
+                console.log("x1: " + x1);
+                console.log("x2: " + x2);
+                console.log("y1: " + y1);
+                console.log("y2: " + y2);
+                console.log("currentX: " + currentX);
+                console.log("currentY: " + currentY);
+                */
+
+                if( x1 == x2 ) {  // veritical line
+                    if( currentX == x1 ) {
+                        if( currentY >= y1 && currentY <= y2 ) {
+                            this.#gameOver(1);
                         }
-                        if( currentLine[1] == this.paths[i+1][1] ) {
-                            this.#gameOver();
+                        if( currentY >= y2 && currentY <= y1 ) {
+                            this.#gameOver(2);
                         }
-                        if( this.paths[i][1] > this.paths[i+1][1] ) {
-                            if( (currentLine[1] > this.paths[i+1][1]) && (currentLine[1] < this.paths[i][1]) ) {
-                                this.#gameOver();
-                            }
-                        }
-                        else {
-                            if( (currentLine[1] > this.paths[i][1]) && (currentLine[1] < this.paths[i+1][1]) ) {
-                                this.#gameOver();
-                            }
-                        }
-                    } 
+                    }
                 }
                 else {  // horizontal line
-
+                    if( currentY == y1 ) {
+                        if( currentX >= x1 && currentX <= x2 ) {
+                            this.#gameOver(3);
+                        }
+                        if( currentX >= x2 && currentX <= x1 ) {
+                            this.#gameOver(4);
+                        }
+                    }
                 }
 
                 i++;
             }
         }
         catch(e) {
-            console.log("Game Over")
+            console.log("Game Over");
+            console.log(e);
         }
 
     }
 
-    #gameOver() {
+    #gameOver(msg) {
         this.stop();
         window.alert("Game Over");
-        throw "Game Over";
+        throw "Game Over: " + msg;
     }
 
     #reduceTail(size=1) {
