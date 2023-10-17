@@ -49,32 +49,44 @@ class Snake {
 
     #setupKey() {
         document.onkeyup=(env) => {
+            if( !this.isPlaying ) {
+                return;
+            }
+
+            var isArrowKey = false;
             logConsole( env.key );
             if( this.movement == Movement.HORIZONTAL ) {
                 if( env.key == KeyName.ArrowUp ) {
+                    isArrowKey = true;
                     this.movement = Movement.VERTICAL;
                     this.movementDir = Movement.DIR.MINUS;
                 }
                 else if( env.key == KeyName.ArrowDown ) {
+                    isArrowKey = true;
                     this.movement = Movement.VERTICAL;
                     this.movementDir = Movement.DIR.PLUS;
                 }
             }
             else {
                 if( env.key == KeyName.ArrowLeft ) {
+                    isArrowKey = true;
                     this.movement = Movement.HORIZONTAL;
                     this.movementDir = Movement.DIR.MINUS;
                 }
                 else if( env.key == KeyName.ArrowRight ) {
+                    isArrowKey = true;
                     this.movement = Movement.HORIZONTAL;
                     this.movementDir = Movement.DIR.PLUS;
                 }
             }
-            var i = this.paths.length - 1;
-            var new_x = this.paths[i][0];
-            var new_y = this.paths[i][1];
-            this.paths.push( [new_x, new_y] );
-            logConsole( this.paths );
+
+            if( isArrowKey ) {
+                var i = this.paths.length - 1;
+                var new_x = this.paths[i][0];
+                var new_y = this.paths[i][1];
+                this.paths.push( [new_x, new_y] );
+                logConsole( this.paths );
+            }
         }
     }
 
@@ -93,7 +105,7 @@ class Snake {
             this.#redraw()
         }
 
-        document.onmouseup=(env) => {
+        this.canvas.onmouseup=(env) => {
             if( this.isPlaying ) {
                 this.stop();
                 this.isPlaying = false;
@@ -205,6 +217,31 @@ class Snake {
         fileReader.onreadystatechange = function() {
             if (fileReader.readyState === 4 && fileReader.status == "200") {
                 self.paths = JSON.parse(fileReader.responseText);
+                var i = self.paths.length - 1;
+                var x1 = self.paths[i][0];
+                var x2 = self.paths[i-1][0];
+                var y1 = self.paths[i][1];
+                var y2 = self.paths[i-1][1];
+
+                if( x1 == x2 ) {
+                    self.movement = Movement.VERTICAL;
+                    if( y1 >= y2 ) {
+                        self.movementDir = Movement.DIR.PLUS;
+                    }
+                    else {
+                        self.movementDir = Movement.DIR.MINUS;
+                    }
+                }
+                else {
+                    self.movement = Movement.HORIZONTAL;
+                    if( x1 >= x2 ) {
+                        self.movementDir = Movement.DIR.PLUS;
+                    }
+                    else {
+                        self.movementDir = Movement.DIR.MINUS;
+                    }
+                }
+
                 self.#redraw();
             }
         }
@@ -240,21 +277,30 @@ class Snake {
     #checkHit() {
         //console.clear();
         //console.log("path length: " + this.paths.length);
-        if( this.paths.length <= 3 ) {
-            return;
-        }
-
-        console.clear();
         
         var currentLine = this.paths[this.paths.length - 1];
         var i = 0;
         var currentX = currentLine[0];
         var currentY = currentLine[1];
 
+        //console.log("currentX: " + currentX);
+        //console.log("currentY: " + currentY);
         // console.log("current line: " + currentLine);
         // console.log("i = " + i)
 
         try {
+
+            if( currentX <= 0 || currentX >= parseInt(this.canvas.width) ) {
+                this.#gameOver("x edge");
+            }
+            if( currentY <= 0 || currentY >= parseInt(this.canvas.height) ) {
+                this.#gameOver("y edge");
+            }
+
+            if( this.paths.length <= 3 ) {
+                return;
+            }
+
             while( i + 1 < this.paths.length - 3 ) {
                 var x1 = this.paths[i][0];
                 var x2 = this.paths[i+1][0];
@@ -266,27 +312,26 @@ class Snake {
                 console.log("x2: " + x2);
                 console.log("y1: " + y1);
                 console.log("y2: " + y2);
-                console.log("currentX: " + currentX);
-                console.log("currentY: " + currentY);
+                
                 */
 
                 if( x1 == x2 ) {  // veritical line
                     if( currentX == x1 ) {
                         if( currentY >= y1 && currentY <= y2 ) {
-                            this.#gameOver(1);
+                            this.#gameOver("vertical hit 1");
                         }
                         if( currentY >= y2 && currentY <= y1 ) {
-                            this.#gameOver(2);
+                            this.#gameOver("vertical hit 2");
                         }
                     }
                 }
                 else {  // horizontal line
                     if( currentY == y1 ) {
                         if( currentX >= x1 && currentX <= x2 ) {
-                            this.#gameOver(3);
+                            this.#gameOver("horizontal hit 1");
                         }
                         if( currentX >= x2 && currentX <= x1 ) {
-                            this.#gameOver(4);
+                            this.#gameOver("horizontal hit 2");
                         }
                     }
                 }
