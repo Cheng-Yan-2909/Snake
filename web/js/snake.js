@@ -353,42 +353,55 @@ class Snake {
     }
 
     #reduceTail(size=1) {
-        var x = this.paths[0][0];
-        var y = this.paths[0][1];
+        while( size > 0 ) {
+            size -= this.#_reduceTail_(size);
+        }
+    }
 
-        if(this.paths[0][0] == this.paths[1][0]) { // x is the same
+    #_reduceTail_(size) {
+        //console.log("path length: " + this.paths.length)
+        var x1 = this.paths[0][0];
+        var y1 = this.paths[0][1];
+        var x2 = this.paths[1][0];
+        var y2 = this.paths[1][1];
+
+        if(x1 == x2) { // x is the same
             // vertical
-            if( this.paths[0][1] == this.paths[1][1] ) { // y is the same: done
-                this.paths.shift();
-                return;
-            }
-
-            if(this.paths[0][1] > this.paths[1][1]) {
-                // moving up
-                y -= size;
+            if(y1 > y2) {
+                if(y1 - y2 <= size) {
+                    this.paths.shift();
+                    return (y1 - y2);
+                }
+                y1 -= size;
             }
             else {
-                y += size;
+                if( y2 - y1 <= size ) {
+                    this.paths.shift();
+                    return( y2 - y1 );
+                }
+                y1 += size;
             }
         }
         else {
             // horizontal
-            if( this.paths[0][0] == this.paths[1][0] ) {  // x is the same: done
-                this.paths.shift();
-                return;
-            }
-
-            if(this.paths[0][0] > this.paths[1][0]) {
-                // moving left
-                x -= size;
+            if( x1 > x2 ) {
+                if( x1 - x2 <= size ) {
+                    this.paths.shift();
+                    return (x1 - x2);
+                }
+                x1 -= size;
             }
             else {
-                x += size;
+                if( x2 - x1 <= size ) {
+                    this.paths.shift();
+                    return (x2 - x1);
+                }
+                x1 += size;
             }
         }
 
-        this.paths[0] = [ x, y ];
-
+        this.paths[0] = [ x1, y1 ];
+        return size;
     }
 
     #growSnake(size=2) {
