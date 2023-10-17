@@ -117,7 +117,7 @@ class Snake {
                 function() {
                     self.moveSnake();
                 },
-                100
+                50
             );
             logConsole(this.paths);
         }
