@@ -269,7 +269,7 @@ class Snake {
 
     moveSnake() {
         this.#growSnake();
-        this.#reduceTail();
+        this.reduceTail();
         this.#redraw();
         this.#checkHit();
     }
@@ -352,7 +352,7 @@ class Snake {
         throw "Game Over: " + msg;
     }
 
-    #reduceTail(size=1) {
+    reduceTail(size=1) {
         while( size > 0 ) {
             size -= this.#_reduceTail_(size);
         }
